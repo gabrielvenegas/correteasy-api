@@ -12,7 +12,6 @@ import { AuthRequest } from "../../models/Auth/AuthRequest";
 import { ErrorType } from "../../models/Error/ErrorType";
 import { UnauthorizedError } from "routing-controllers";
 import { logger } from "../../../utils/logger";
-import { urlGoogle, createConnection, getGooglePlusApi } from "../../../utils/google";
 
 @Service()
 export class AuthService implements IAuthService {
@@ -36,7 +35,7 @@ export class AuthService implements IAuthService {
     }
   }
 
-  public async login({ mail, password }: AuthRequest, isGoogleAuth = false): Promise<AuthResponse | undefined> {
+  public async login({ mail, password }: AuthRequest): Promise<AuthResponse | undefined> {
     const userRepository = getRepository(User);
     let supplierIds: number[] = [];
 
@@ -63,54 +62,6 @@ export class AuthService implements IAuthService {
     } catch (err) {
       logger().error("AUTH_ERROR", err);
       throw err;
-    }
-  }
-
-  public async googleUrl(): Promise<string> {
-    return urlGoogle();
-  }
-
-  public async googleAuth(code: string): Promise<any> {
-    const auth = createConnection();
-    const userRepository = getRepository(User);
-
-    // get the auth "tokens" from the request
-    const { tokens } = await auth.getToken(code);
-    const credentials = tokens;
-    auth.setCredentials(credentials);
-
-    // connect to google plus - need this to get the user's email
-    const plus = getGooglePlusApi(auth);
-    const { data } = await plus.people.get({ resourceName: "people/me", personFields: "names,emailAddresses" });
-    const { names, emailAddresses } = data;
-
-    if (emailAddresses && emailAddresses?.length > 0) {
-      const mail = emailAddresses[0].value as string;
-      const name = names && (names[0].displayName as string);
-
-      // get user
-      const user = await userRepository.findOne({
-        where: { mail },
-        relations: ["roles", "roles.permissions", "permissions", "suppliers", "suppliers.agents"],
-      });
-
-      if (user) {
-        const token = this.generateJwt(user);
-        return { token };
-      } else {
-        // save user and roles
-        const user = await userRepository.save({
-          name,
-          mail,
-          active: true,
-          password: data.etag as string,
-          isSuper: false,
-        });
-
-        const token = this.generateJwt(user);
-
-        return { token };
-      }
     }
   }
 

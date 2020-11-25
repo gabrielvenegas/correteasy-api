@@ -18,16 +18,4 @@ export class AuthController {
   login(@Body() user: AuthRequest): Promise<AuthResponse | undefined> {
     return this.authService.login(user);
   }
-
-  @Get("/google-url")
-  @OpenAPI({ summary: "Get google url" })
-  getGoogleUrl(): Promise<string> {
-    return this.authService.googleUrl();
-  }
-
-  @Get("/google-auth")
-  @OpenAPI({ summary: "Get token from google auth" })
-  authGoogle(@QueryParam("code") code: string): Promise<any> {
-    return this.authService.googleAuth(code);
-  }
 }

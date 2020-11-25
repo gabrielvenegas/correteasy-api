@@ -1,23 +1,15 @@
-# Pull in the official lightweight version of Node 12.
-FROM node:12-slim
+FROM node:12.19.0-alpine3.12
 
-# Create and change to the app directory.
+RUN mkdir /app
+
 WORKDIR /app
 
-COPY package.json .
-COPY yarn.lock .
+COPY package.json /app
 
-# Install production dependencies.
-RUN yarn install --production
+RUN npm install --silent
 
-# Copy local codebase into the container image
-COPY . .
+COPY . /app
 
-# Compile down to ES5 with Babel
-RUN yarn build
+EXPOSE 8080
 
-# Remove unused src directory
-RUN rm -rf src/
-
-# Start the api server
-CMD [ "yarn", "start" ]
+CMD ["yarn", "dev"]
