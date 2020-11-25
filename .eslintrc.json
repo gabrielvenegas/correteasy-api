@@ -1,0 +1,23 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": false
+    }
+  },
+  "rules": {
+    "semi": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}

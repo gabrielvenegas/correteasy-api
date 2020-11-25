@@ -1,0 +1,41 @@
+import { google } from "googleapis";
+import { env } from "../env";
+
+/**
+ * This scope tells google what information we want to request.
+ */
+const defaultScope = [
+  "https://www.googleapis.com/auth/userinfo.profile",
+  "https://www.googleapis.com/auth/userinfo.email",
+];
+
+/**
+ * Get a url which will open the google sign-in page and request access to the scope provided (such as calendar events).
+ */
+const getConnectionUrl = (auth: any) => {
+  return auth.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent", // access type and approval prompt will force a new refresh token to be made each time signs in
+    scope: defaultScope,
+  });
+};
+
+const createConnection = () => {
+  const { api } = env.google;
+  return new google.auth.OAuth2(api.clientId, api.secretKey, api.redirectUrl);
+};
+
+/**
+ * Create the google url to be sent to the client.
+ */
+const urlGoogle = (): string => {
+  const auth = createConnection(); // this is from previous step
+  const url = getConnectionUrl(auth);
+  return url;
+};
+
+const getGooglePlusApi = (auth: any) => {
+  return google.people({ version: "v1", auth });
+};
+
+export { urlGoogle, createConnection, getGooglePlusApi };
