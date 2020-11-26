@@ -21,15 +21,7 @@ export class UserService implements IUserService {
   }
 
   async fetchOne(id: number, { relations }: any): Promise<User> {
-    let relationList;
-    if (relations) {
-      const rel = relations.split(",");
-      relationList = ["department"].concat(rel);
-    } else {
-      relationList = ["department"];
-    }
-
-    return this.userRepository.findOneOrFail({ where: { id }, relations: relationList });
+    return this.userRepository.findOneOrFail({ where: { id } });
   }
 
   async createOne(userRequest: UserRequest): Promise<User> {

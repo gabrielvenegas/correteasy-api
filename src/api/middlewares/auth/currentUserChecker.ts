@@ -14,7 +14,7 @@ export function currentUserChecker(): (action: Action) => Promise<User> | User {
     try {
       const userRepository = getRepository(User);
 
-      return userRepository.findOneOrFail(user_id, { relations: ["department", "roles", "physicalStores"] });
+      return userRepository.findOneOrFail(user_id);
     } catch (err) {
       throw new UnauthorizedError(err);
     }
